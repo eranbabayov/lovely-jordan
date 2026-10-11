@@ -13,6 +13,28 @@ plus its companions. Read those before changing behaviour.
 | `npm run dev` | local dev server |
 | `npm run build` | typecheck, then build to `dist/` |
 | `npm run preview` | serve the built `dist/` locally |
+| `npm run images` | rebuild photos + manifest from `images/` |
+| `npm run seal` | encrypt `gifts-src/` into `public/gifts/` |
+| `npm run icons` | regenerate app icons |
+| `npm run digests` | print answer digests for `src/config.ts` |
+| `npm run check` | run every correctness check |
+
+**Run `npm run check` before deploying.** It verifies answer normalization,
+Hebrew countdown dual forms, the reveal-date DST offsets, and the full
+seal/unseal round trip — including that every accepted spelling opens a gift
+sealed under the canonical one.
+
+## Changing things later
+
+| To do this | Change this |
+|---|---|
+| Swap a gift's content | edit `gifts-src/<id>.md`, `npm run seal` |
+| Add or remove a gift | add the file, add one entry to `GIFTS` in `src/config.ts`, `npm run seal` |
+| Change a reveal time | `revealAt` in `src/config.ts` (ISO with explicit offset) |
+| Change slideshow pace | `SLIDE_MS` in `src/config.ts` |
+| Add photos | drop them in `images/`, `npm run images` |
+| Add music | put the file in `public/`, set `MUSIC_SRC` in `src/config.ts` |
+| Add a photo caption | `caption` in `public/images/manifest.json` (survives re-runs) |
 
 ## Deploying
 
@@ -39,12 +61,17 @@ Two rules:
 ```
 images/        original photos (gitignored) — 25 JPEGs
 gifts-src/     PLAINTEXT gift content (gitignored, never commit)
+secrets/       PLAINTEXT gate answers (gitignored, never commit)
 src/config.ts  the one file to edit: pace, questions, gifts, reveal times
-public/        static assets; build output for images and sealed gifts lands here
+public/        static assets; generated images and sealed gifts land here
 ```
+
+Two directories are gitignored because they hold secrets, not because they are
+noise: `gifts-src/` and `secrets/`. Committing either defeats the sealing
+entirely — anyone with repo access could derive the key and open every gift.
 
 ## Status
 
-Story 1 of 7 complete: RTL shell, build, deploy config. Stories 2–7 add the
-image pipeline, slideshow, gate, countdowns, sealing, and the PWA shell —
-see `stories.yaml` in the spec folder.
+All 7 stories complete. The app builds to a 5.23 MB static `dist/` and has not
+yet been deployed or opened on a real phone.
+

@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "digests": "node scripts/answer-digests.mjs",
     "check": "node scripts/answer-digests.mjs && node scripts/check-countdown.mjs && node scripts/check-seal.mjs",
-    "seal": "node scripts/seal-gifts.mjs"
+    "seal": "node scripts/seal-gifts.mjs",
+    "icons": "node scripts/build-icons.mjs"
   },
   "dependencies": {
     "react": "^19.3.0",

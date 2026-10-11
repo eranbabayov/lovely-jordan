@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { GiftConfig } from '../config';
 import { GIFTS } from '../config';
 import { giftState } from '../lib/gifts';
 import { now, syncClock } from '../lib/time';
+import { playChime } from '../lib/audio';
 import GiftBox from './GiftBox';
 
 interface GiftShelfProps {
@@ -32,6 +33,26 @@ export default function GiftShelf({ openedIds, onOpen }: GiftShelfProps) {
     const id = window.setInterval(() => setTick(now()), 1000);
     return () => window.clearInterval(id);
   }, []);
+
+  // Chime the instant a countdown reaches zero — but only on an actual
+  // transition, never on first render, or every already-open gift would
+  // chime on arrival.
+  const wasReady = useRef<Map<string, boolean> | null>(null);
+  useEffect(() => {
+    const current = new Map(
+      GIFTS.map((g) => [g.id, giftState(g, tick).status === 'ready']),
+    );
+    const previous = wasReady.current;
+    if (previous) {
+      for (const [id, ready] of current) {
+        if (ready && previous.get(id) === false) {
+          playChime();
+          break;
+        }
+      }
+    }
+    wasReady.current = current;
+  }, [tick]);
 
   if (GIFTS.length === 0) return null;
 

@@ -4,6 +4,8 @@ import Gate from './components/Gate';
 import Slideshow from './components/Slideshow';
 import GiftShelf from './components/GiftShelf';
 import GiftOpening from './components/GiftOpening';
+import MuteButton from './components/MuteButton';
+import { unlock as unlockAudio } from './lib/audio';
 import type { Photo } from './lib/photos';
 import { loadManifest } from './lib/photos';
 import type { GiftConfig } from './config';
@@ -70,7 +72,7 @@ export default function App() {
       .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
   }, []);
 
-  const unlock = (value: string) => {
+  const rememberUnlock = (value: string) => {
     setMaterial(value);
     try {
       window.localStorage.setItem(STORAGE_KEYS.unlocked, value);
@@ -79,8 +81,19 @@ export default function App() {
     }
   };
 
-  if (!begun) return <Opening onBegin={() => setBegun(true)} />;
-  if (material === null) return <Gate onUnlock={unlock} />;
+  if (!begun) {
+    return (
+      <Opening
+        onBegin={() => {
+          // Must run inside the click handler: mobile browsers only permit
+          // audio to start from a user gesture.
+          unlockAudio();
+          setBegun(true);
+        }}
+      />
+    );
+  }
+  if (material === null) return <Gate onUnlock={rememberUnlock} />;
 
   if (error) {
     return (
@@ -102,6 +115,13 @@ export default function App() {
   return (
     <main className="relative flex-1">
       <Slideshow photos={photos} />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 flex justify-start p-3"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
+      >
+        <MuteButton />
+      </div>
+
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
         <GiftShelf openedIds={openedIds} onOpen={setActiveGift} />
       </div>
