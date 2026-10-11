@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import type { GiftConfig } from '../config';
 import { GIFTS } from '../config';
 import { giftState } from '../lib/gifts';
-import { now, syncClock } from '../lib/time';
+import { useNow } from '../lib/useNow';
 import { playChime } from '../lib/audio';
 import GiftBox from './GiftBox';
 
@@ -16,23 +16,8 @@ interface GiftShelfProps {
  * structural, so adding or removing a gift is a config-only edit.
  */
 export default function GiftShelf({ openedIds, onOpen }: GiftShelfProps) {
-  const [tick, setTick] = useState(() => now());
-
-  // One session-wide clock correction, then tick locally against it.
-  useEffect(() => {
-    let active = true;
-    syncClock().finally(() => {
-      if (active) setTick(now());
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const id = window.setInterval(() => setTick(now()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
+  // Shared corrected clock — the same tick the birthday counter runs on.
+  const tick = useNow();
 
   // Chime the instant a countdown reaches zero — but only on an actual
   // transition, never on first render, or every already-open gift would

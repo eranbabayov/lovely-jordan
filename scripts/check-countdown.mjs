@@ -67,26 +67,39 @@ expect(formatClock(100 * DAY), '100:00:00:00', 'days are not capped at two digit
 
 console.log('\nConfigured reveal dates — Israel wall clock');
 // Israel is UTC+3 under DST, UTC+2 otherwise; DST ends Sunday 2026-10-25.
+// Keep these in sync with src/config.ts — Node cannot import the TS config.
 const cases = [
-  { iso: '2026-10-18T20:00:00+03:00', expectUtc: '2026-10-18T17:00:00.000Z', note: 'gift2, during DST' },
-  { iso: '2026-11-01T20:00:00+02:00', expectUtc: '2026-11-01T18:00:00.000Z', note: 'gift3, after DST ends' },
+  { iso: '2026-10-18T20:00:00+03:00', expectUtc: '2026-10-18T17:00:00.000Z', wall: '20:00', note: 'gift2, during DST' },
+  { iso: '2026-11-01T20:00:00+02:00', expectUtc: '2026-11-01T18:00:00.000Z', wall: '20:00', note: 'gift3, after DST ends' },
+  { iso: '2026-12-01T00:00:00+02:00', expectUtc: '2026-11-30T22:00:00.000Z', wall: '00:00', note: 'birthday, midnight 1 Dec' },
 ];
 for (const { iso, expectUtc, note } of cases) {
   const parsed = new Date(Date.parse(iso)).toISOString();
   expect(parsed, expectUtc, note);
 }
 
-// Both should read as 20:00 local Israel time — the actual intent.
+// Each must land on its intended Israel wall-clock time.
 console.log('\n  rendered in Asia/Jerusalem:');
-for (const { iso, note } of cases) {
+for (const { iso, wall, note } of cases) {
   const local = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Asia/Jerusalem',
     dateStyle: 'short',
     timeStyle: 'short',
+    hourCycle: 'h23',
   }).format(new Date(iso));
-  const ok = local.endsWith('20:00');
+  const ok = local.endsWith(wall);
   if (!ok) failures += 1;
   console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${note.padEnd(34)} ${local}`);
+}
+
+// The birthday must land on 1 December in Israel, not 30 November — the
+// classic off-by-one when a midnight UTC offset is written wrong.
+{
+  const day = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Jerusalem',
+    dateStyle: 'short',
+  }).format(new Date('2026-12-01T00:00:00+02:00'));
+  expect(day, '01/12/2026', 'birthday falls on 1 Dec in Israel');
 }
 
 console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}\n`);

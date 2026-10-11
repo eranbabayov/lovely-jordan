@@ -6,6 +6,10 @@ import { SLIDE_MS } from '../config';
 
 interface PhotoRowProps {
   photos: Photo[];
+  /** Slide the opposite way, so a second strip mirrors the first. */
+  reverse?: boolean;
+  /** Offset the starting position so both strips are not in lockstep. */
+  offset?: boolean;
 }
 
 /**
@@ -18,7 +22,7 @@ interface PhotoRowProps {
  * exactly -50% — so the second copy lands precisely where the first began and
  * the seam is invisible. No JS ticking, no index arithmetic.
  */
-export default function PhotoRow({ photos }: PhotoRowProps) {
+export default function PhotoRow({ photos, reverse = false, offset = false }: PhotoRowProps) {
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
 
@@ -52,6 +56,11 @@ export default function PhotoRow({ photos }: PhotoRowProps) {
           {
             animationDuration: `${durationMs}ms`,
             animationPlayState: running ? 'running' : 'paused',
+            animationDirection: reverse ? 'reverse' : 'normal',
+            // A negative delay starts the animation already part-way through,
+            // so the two strips show different photos instead of marching in
+            // lockstep. Still seamless — the loop is continuous.
+            animationDelay: offset ? `-${Math.round(durationMs / 2)}ms` : '0ms',
           } as CSSProperties
         }
       >

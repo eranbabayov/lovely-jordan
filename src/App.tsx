@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import Opening from './components/Opening';
 import Gate from './components/Gate';
 import PhotoRow from './components/PhotoRow';
+import BirthdayCountdown from './components/BirthdayCountdown';
+import RotatingNote from './components/RotatingNote';
 import GiftShelf from './components/GiftShelf';
 import GiftOpening from './components/GiftOpening';
 import MuteButton from './components/MuteButton';
@@ -114,13 +116,20 @@ export default function App() {
 
   return (
     <main className="relative flex flex-1 flex-col">
-      {/* Photos read as a band across the top; the gifts own the centre. */}
+      {/* Two photo bands frame the page, sliding opposite ways so the screen
+          is never still; everything between them ticks or fades. */}
       <div className="shrink-0 pt-3">
         <PhotoRow photos={photos} />
       </div>
 
-      <div className="flex flex-1 items-center justify-center py-6">
+      <div className="flex flex-1 flex-col items-center justify-center gap-7 py-7">
+        <BirthdayCountdown />
         <GiftShelf openedIds={openedIds} onOpen={setActiveGift} />
+        <RotatingNote />
+      </div>
+
+      <div className="shrink-0 pb-3">
+        <PhotoRow photos={photos} reverse offset />
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-start p-3">

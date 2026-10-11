@@ -117,6 +117,40 @@ export const GIFTS: GiftConfig[] = [
 ];
 
 /**
+ * Yarden's birthday, as ISO-8601 with an explicit offset.
+ *
+ * 2026-12-01 falls after Israeli DST ends on 2026-10-25, so the offset is
+ * +02:00. Midnight, so the countdown hits zero as the day itself begins.
+ *
+ * Set to `null` to hide the birthday counter entirely.
+ */
+export const BIRTHDAY: string | null = '2026-12-01T00:00:00+02:00';
+
+/** Shown above the counter while it is still counting down. */
+export const BIRTHDAY_LABEL = 'עוד רגע ליום ההולדת שלך';
+
+/** Shown instead of the counter once the day arrives. */
+export const BIRTHDAY_ARRIVED = 'יום הולדת שמח 🎂';
+
+/**
+ * Short birthday wishes that fade one into the next under the gifts.
+ *
+ * All second-person feminine, matching the rest of the copy. Edit freely —
+ * any number of lines works, and an empty array hides the element entirely.
+ */
+export const NOTES: string[] = [
+  'יום הולדת שמח, יפיופה שלי 🎂',
+  'שתהיה לך שנה מתוקה כמוך',
+  'כמה טוב שאת בעולם',
+  'כל מה שתבקשי — שיתגשם',
+  'את המתנה הכי יפה שלי',
+  'עוד הרבה ימי הולדת ביחד ❤️',
+];
+
+/** How long each line holds before fading to the next. */
+export const NOTE_ROTATE_MS = 7000;
+
+/**
  * No track supplied, so the app ships silent (SPEC.md § Assumptions).
  * Set a path under `public/` to enable audio; the mute control and the
  * countdown chime stay behind this flag so nothing broken is shown.
