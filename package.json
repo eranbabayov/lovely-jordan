@@ -6,6 +6,7 @@
   "description": "A private gift for Yarden — looping photo slideshow and time-locked gifts.",
   "scripts": {
     "dev": "vite",
+    "images": "node scripts/build-images.mjs",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview"
@@ -19,6 +20,8 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^4.7.0",
+    "exifr": "^7.1.3",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^6.4.4"
