@@ -59,6 +59,23 @@
      keyframe animations are suppressed but opacity transitions must survive —
      the slideshow crossfade in story 3 depends on them. Do not add a blanket
      `transition-duration: 0.01ms` here. */
+  /* Slow drift across each photo. Deliberately a keyframe ANIMATION, so the
+     reduced-motion rule below suppresses it while the crossfade (an opacity
+     transition) survives — "degrade to plain fades", per stack.md. */
+  @keyframes ken-burns {
+    from {
+      transform: scale(1.02) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.12) translate3d(0, -1.5%, 0);
+    }
+  }
+
+  .ken-burns {
+    animation: ken-burns var(--kb-duration, 4800ms) ease-out forwards;
+    will-change: transform;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
