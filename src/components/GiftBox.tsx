@@ -9,6 +9,10 @@ interface GiftBoxProps {
   state: GiftState;
   opened: boolean;
   onOpen: (gift: GiftConfig) => void;
+  /** Tapped before its time — answered with a nudge and a message. */
+  onLockedTap: (gift: GiftConfig) => void;
+  /** Increments per locked tap, so the nudge replays on every attempt. */
+  nudge: number;
 }
 
 /**
@@ -17,15 +21,23 @@ interface GiftBoxProps {
  * A locked box still shows itself and its countdown — never hidden, because
  * anticipation is half the gift.
  */
-export default function GiftBox({ gift, state, opened, onOpen }: GiftBoxProps) {
+export default function GiftBox({
+  gift,
+  state,
+  opened,
+  onOpen,
+  onLockedTap,
+  nudge,
+}: GiftBoxProps) {
   const openable = isOpenable(state.status);
   const broken = state.status === 'misconfigured';
 
   return (
     <button
       type="button"
-      onClick={() => openable && onOpen(gift)}
-      disabled={!openable}
+      // Deliberately NOT disabled when locked: a box that ignores a tap reads
+      // as broken. It answers instead — a nudge and a message.
+      onClick={() => (openable ? onOpen(gift) : onLockedTap(gift))}
       // Digits for the eye, prose for a screen reader: "יומיים" reads far
       // better than "02:00:00:00".
       aria-label={
@@ -33,14 +45,19 @@ export default function GiftBox({ gift, state, opened, onOpen }: GiftBoxProps) {
           ? `${gift.title} — אפשר לפתוח`
           : `${gift.title} — ${formatCountdown(state.remainingMs)}`
       }
-      className={`flex w-full flex-col items-center gap-4 rounded-3xl border p-5 transition ${
+      className={`flex w-full cursor-pointer flex-col items-center gap-4 rounded-3xl border p-5 transition active:scale-[0.97] ${
         openable
-          ? 'cursor-pointer border-gold/50 bg-plum-soft/40 shadow-[0_0_40px_-12px_var(--color-gold)] hover:border-gold active:scale-[0.97]'
-          : 'cursor-default border-cream/10 bg-plum/25'
+          ? 'border-gold/50 bg-plum-soft/40 shadow-[0_0_40px_-12px_var(--color-gold)] hover:border-gold'
+          : 'border-cream/10 bg-plum/25 hover:border-cream/20'
       }`}
     >
       <span
+        // Keyed on the nudge counter so the animation restarts on every tap,
+        // not only the first.
+        key={nudge}
         className={`relative flex h-28 w-28 items-center justify-center rounded-3xl border-2 text-5xl transition sm:h-32 sm:w-32 sm:text-6xl ${
+          nudge > 0 ? 'animate-nudge' : ''
+        } ${
           openable ? 'border-gold/60 bg-plum-soft/60' : 'border-cream/15 bg-plum/40'
         } ${state.status === 'imminent' ? 'animate-tremble' : ''} ${
           openable && !opened ? 'animate-float' : ''

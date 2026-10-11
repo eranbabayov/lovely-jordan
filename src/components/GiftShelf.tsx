@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { GiftConfig } from '../config';
-import { GIFTS } from '../config';
+import { GIFTS, LOCKED_MESSAGE, LOCKED_MESSAGE_MS } from '../config';
 import { giftState } from '../lib/gifts';
 import { useNow } from '../lib/useNow';
 import { playChime } from '../lib/audio';
@@ -18,6 +18,26 @@ interface GiftShelfProps {
 export default function GiftShelf({ openedIds, onOpen }: GiftShelfProps) {
   // Shared corrected clock — the same tick the birthday counter runs on.
   const tick = useNow();
+
+  /** Which box was tapped too early, and how many times (to replay the nudge). */
+  const [tease, setTease] = useState<{ id: string; count: number } | null>(null);
+  const teaseTimer = useRef<number | null>(null);
+
+  const onLockedTap = (gift: GiftConfig) => {
+    setTease((previous) => ({
+      id: gift.id,
+      count: previous?.id === gift.id ? previous.count + 1 : 1,
+    }));
+    if (teaseTimer.current !== null) window.clearTimeout(teaseTimer.current);
+    teaseTimer.current = window.setTimeout(() => setTease(null), LOCKED_MESSAGE_MS);
+  };
+
+  useEffect(
+    () => () => {
+      if (teaseTimer.current !== null) window.clearTimeout(teaseTimer.current);
+    },
+    [],
+  );
 
   // Chime the instant a countdown reaches zero — but only on an actual
   // transition, never on first render, or every already-open gift would
@@ -54,9 +74,20 @@ export default function GiftShelf({ openedIds, onOpen }: GiftShelfProps) {
             state={giftState(gift, tick)}
             opened={openedIds.includes(gift.id)}
             onOpen={onOpen}
+            onLockedTap={onLockedTap}
+            nudge={tease?.id === gift.id ? tease.count : 0}
           />
         ))}
       </div>
+
+      {/* Height is reserved so the message appearing never shifts the boxes. */}
+      <p
+        className="mt-4 flex min-h-7 items-center justify-center text-center text-base font-light text-gold-soft transition-opacity duration-300"
+        style={{ opacity: tease ? 1 : 0 }}
+        aria-live="polite"
+      >
+        {tease ? LOCKED_MESSAGE : ''}
+      </p>
     </section>
   );
 }

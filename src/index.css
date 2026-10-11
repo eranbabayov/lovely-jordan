@@ -145,6 +145,24 @@
     animation-fill-mode: forwards;
   }
 
+  /* Tapping a still-locked gift: a small refusal, not a rejection. */
+  @keyframes nudge {
+    0%,
+    100% {
+      transform: rotate(0deg) scale(1);
+    }
+    30% {
+      transform: rotate(-4deg) scale(1.04);
+    }
+    60% {
+      transform: rotate(4deg) scale(1.04);
+    }
+  }
+
+  .animate-nudge {
+    animation: nudge 420ms ease-in-out;
+  }
+
   /* Wrong answer. Decorative, so losing it under reduced motion is fine. */
   @keyframes shake {
     0%,

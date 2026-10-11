@@ -130,6 +130,17 @@ export const GIFTS: GiftConfig[] = [
  */
 export const BIRTHDAY: string | null = '2026-12-01T00:00:00+02:00';
 
+/**
+ * Shown when she taps a gift that has not unlocked yet.
+ *
+ * The doubled letters are the playful drawn-out spelling as written — left
+ * exactly as given rather than "corrected".
+ */
+export const LOCKED_MESSAGE = 'סבלנותת יפיופהה 💛';
+
+/** How long that message lingers before fading out. */
+export const LOCKED_MESSAGE_MS = 3000;
+
 /** Shown above the counter while it is still counting down. */
 export const BIRTHDAY_LABEL = 'עוד רגע ליום ההולדת שלך';
 
