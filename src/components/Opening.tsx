@@ -12,7 +12,7 @@ export default function Opening({ onBegin }: OpeningProps) {
     <main className="flex flex-1 flex-col items-center justify-center gap-10 px-8 text-center">
       <div className="space-y-4">
         <h1 className="font-display text-5xl font-light tracking-wide text-gold-soft">
-          בשבילך
+          מזל טוב ליפה בנשים!
         </h1>
         <p className="text-lg font-light text-cream/70">משהו קטן שהכנתי לך</p>
       </div>
