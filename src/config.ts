@@ -37,10 +37,18 @@ export interface AnswerConfig {
    * SHA-256 hex digests of `normalize(answer)`. More than one entry means
    * more than one accepted answer. An EMPTY array matches nothing, which is
    * the correct fail-closed default while these are unpopulated.
+   *
+   * Regenerate with `npm run digests`.
    */
   digests: string[];
   /** Revealed after 3 wrong attempts. */
   hint: string;
+  /**
+   * Shown after 6 wrong attempts. Only the first character, because the
+   * plaintext answer is deliberately not in the bundle — this one letter is
+   * the intended leak, not an accident.
+   */
+  firstLetter: string;
 }
 
 /**
@@ -55,22 +63,28 @@ export const SLIDE_MS = 4000;
 export const CROSSFADE_MS = 800;
 
 /**
- * The gate. Digests are populated in story 4 — see the spec companion
- * `hebrew-matching.md` for the accepted answers and the normalization that
- * must be applied identically at hash time and compare time.
+ * The gate. Digests are `sha256(normalize(answer))` — the plaintext answers
+ * exist only in `scripts/answer-digests.mjs`, never here.
  *
- * Question 2 accepts two answers, so it will carry two digests.
+ * Question 2 accepts two spellings and so carries two digests. Both collapse
+ * to the same key-derivation form via `canonicalize()`, which is what lets a
+ * gift sealed under one spelling open for someone who typed the other.
  */
 export const ANSWERS: AnswerConfig[] = [
   {
     q: 'איך אני קורא לך?',
-    digests: [], // TODO(story-4): sha256(normalize('יפיופה'))
+    digests: ['e5e1b42c783cd22089abc3d1d919962bbd583a4289a51ef38b6ca82dc84d7943'],
     hint: 'ככה אני קורא לך כשאת מתעוררת',
+    firstLetter: 'י',
   },
   {
     q: 'של מי את?',
-    digests: [], // TODO(story-4): sha256(normalize('של ערן')), sha256(normalize('ערן'))
+    digests: [
+      '7176db2669ca14f6f72e3b803bac71c9e94db4f00a44bd832512e21d51933c05',
+      'dcbfa43013ed114b83c306346ef79bcec327687efed56581ea3b2eaee58573bf',
+    ],
     hint: 'שתי מילים. השנייה זה השם שלי',
+    firstLetter: 'ש',
   },
 ];
 
