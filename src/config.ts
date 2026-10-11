@@ -64,16 +64,20 @@ export const CROSSFADE_MS = 800;
 
 /**
  * The gate. Digests are `sha256(normalize(answer))` — the plaintext answers
- * exist only in `scripts/answer-digests.mjs`, never here.
+ * exist only in the gitignored `secrets/answers.mjs`, never here.
  *
- * Question 2 accepts two spellings and so carries two digests. Both collapse
- * to the same key-derivation form via `canonicalize()`, which is what lets a
- * gift sealed under one spelling open for someone who typed the other.
+ * Both questions accept two spellings and so carry two digests each. Every
+ * spelling collapses to the same key-derivation form via `canonicalize()`,
+ * which is what lets a gift sealed under one spelling open for someone who
+ * typed another. `npm run check` asserts that across all four combinations.
  */
 export const ANSWERS: AnswerConfig[] = [
   {
     q: 'איך אני קורא לך?',
-    digests: ['e5e1b42c783cd22089abc3d1d919962bbd583a4289a51ef38b6ca82dc84d7943'],
+    digests: [
+      'e5e1b42c783cd22089abc3d1d919962bbd583a4289a51ef38b6ca82dc84d7943',
+      '4a1e2a038664d23b46fd2db8664fa89d6b4c0c243315ac6aa168e65cffe4f927',
+    ],
     hint: 'ככה אני קורא לך כשאת מתעוררת',
     firstLetter: 'י',
   },
@@ -140,15 +144,16 @@ export const BIRTHDAY_ARRIVED = 'יום הולדת שמח 🎂';
  */
 export const NOTES: string[] = [
   'יום הולדת שמח, יפיופה שלי 🎂',
-  'שתהיה לך שנה מתוקה כמוך',
-  'כמה טוב שאת בעולם',
+  '❤️אני שרוף לך על פלח ימין',
+  'כמה טוב שהורדת אוקיי קיופד',
   'כל מה שתבקשי — שיתגשם',
   'את המתנה הכי יפה שלי',
   'עוד הרבה ימי הולדת ביחד ❤️',
+   'שתעלי מעלה מעלה',
 ];
 
 /** How long each line holds before fading to the next. */
-export const NOTE_ROTATE_MS = 7000;
+export const NOTE_ROTATE_MS = 4000;
 
 /**
  * No track supplied, so the app ships silent (SPEC.md § Assumptions).

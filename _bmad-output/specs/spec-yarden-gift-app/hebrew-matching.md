@@ -6,12 +6,23 @@ Companion to `SPEC.md`, governing CAP-1 and the countdown text in CAP-3.
 
 ## The questions and their accepted answers
 
-| | Question | Accepted input | Normalized form |
-|---|---|---|---|
-| Q1 | `איך אני קורא לך?` | `יפיופה` | `יפיופה` |
-| Q2 | `של מי את?` | `של ערן` · `ערן` · `שֶׁל עֵרָן` · `" ערן "` | `שלערנ` · `ערנ` |
+| | Question | Accepted input | Normalized form | Canonical (key) |
+|---|---|---|---|---|
+| Q1 | `איך אני קורא לך?` | `יפיופה` · `יפיופה שלי` | `יפיופה` · `יפיופהשלי` | `יפיופה` |
+| Q2 | `של מי את?` | `של ערן` · `ערן` · `שֶׁל עֵרָן` · `" ערן "` | `שלערנ` · `ערנ` | `ערנ` |
 
-Both spellings of Q2 are correct per Eran. Q2 therefore holds **two** accepted digests, not one.
+Each question holds **two** accepted digests, one per spelling.
+
+## Two normalizations, and why
+
+Verification and key derivation need different things, so there are two functions:
+
+- **`normalize()`** — used to compare against the digest list. Several spellings may map to several digests; that is fine and intended.
+- **`canonicalize()`** — used to derive the gift key. Here every accepted spelling of a question **must** collapse to one string, because a gift sealed under one spelling would otherwise be permanently unopenable by someone who typed another.
+
+`canonicalize()` achieves that by stripping two Hebrew possessives: a trailing `שלי` (so `יפיופה שלי` ≡ `יפיופה`) and a leading `של` (so `של ערן` ≡ `ערן`). Trailing first, so a phrase carrying both loses both ends.
+
+Resulting key material across all **four** combinations: `יפיופה|ערנ`. `npm run check` asserts this exhaustively — adding a spelling that breaks it fails the suite rather than silently bricking the gifts.
 
 ## Normalization
 

@@ -69,6 +69,7 @@ check(opened === message, 'plaintext survives the round trip exactly');
 // ---- The critical invariant: EVERY accepted spelling must open the gift ----
 console.log('\nEvery accepted spelling opens a gift sealed under the canonical one');
 const [q1Spellings, q2Spellings] = ACCEPTED_ANSWERS;
+console.log(`  (${q1Spellings.length} x ${q2Spellings.length} = ${q1Spellings.length * q2Spellings.length} combinations)`);
 for (const a1 of q1Spellings) {
   for (const a2 of q2Spellings) {
     const material = keyMaterial([a1, a2]);

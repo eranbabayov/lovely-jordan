@@ -50,26 +50,38 @@ export function normalize(input) {
   return out.toLowerCase();
 }
 
-/** The Hebrew possessive proclitic "של" ("of"). */
+/** The Hebrew possessive proclitic "של" ("of"), which leads a phrase. */
 const SHEL = 'של';
+/** The first-person possessive suffix "שלי" ("my"), which trails one. */
+const SHELI = 'שלי';
 
 /**
  * Reduce input to its KEY-DERIVATION form.
  *
- * Verification compares against a list of accepted digests, so two spellings
- * of one answer are fine there. Key derivation cannot work that way: both
- * spellings must produce the *same* key, or a gift sealed under one spelling
- * is unopenable by someone who typed the other.
+ * Verification compares against a list of accepted digests, so several
+ * spellings of one answer are fine there. Key derivation cannot work that
+ * way: every accepted spelling must produce the *same* key, or a gift sealed
+ * under one is unopenable by someone who typed another.
  *
- * Collapsing a leading "של" does it — "של ערן" and "ערן" both canonicalize to
- * the same string — without putting any answer plaintext in the bundle.
+ * Two possessives are therefore collapsed, and both are load-bearing:
+ *   - trailing "שלי"  — "יפיופה שלי" ≡ "יפיופה"
+ *   - leading  "של"   — "של ערן"    ≡ "ערן"
+ *
+ * Trailing is stripped first: a hypothetical "של X שלי" should lose both ends
+ * rather than only one. No answer plaintext enters the bundle either way.
  *
  * @param {unknown} input
  * @returns {string}
  */
 export function canonicalize(input) {
-  const n = normalize(input);
-  return n.startsWith(SHEL) ? n.slice(SHEL.length) : n;
+  let out = normalize(input);
+  if (out.length > SHELI.length && out.endsWith(SHELI)) {
+    out = out.slice(0, -SHELI.length);
+  }
+  if (out.length > SHEL.length && out.startsWith(SHEL)) {
+    out = out.slice(SHEL.length);
+  }
+  return out;
 }
 
 /**

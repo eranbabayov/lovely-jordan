@@ -5,7 +5,9 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "types": ["vite/client"],
+    // "node" is needed by vite.config.ts, which reads process.env to decide
+    // whether to enable the self-signed HTTPS dev server.
+    "types": ["vite/client", "node"],
 
     "strict": true,
     "noUnusedLocals": true,

@@ -22,7 +22,7 @@ export default function Opening({ onBegin }: OpeningProps) {
         onClick={onBegin}
         className="rounded-full border border-gold/40 bg-plum/60 px-12 py-4 text-lg font-medium text-gold-soft transition hover:border-gold hover:bg-plum-soft/70 active:scale-95"
       >
-        התחילי
+        רק נוודא שזאת באמת את...
       </button>
     </main>
   );

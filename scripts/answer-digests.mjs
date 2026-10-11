@@ -41,19 +41,32 @@ for (const [messy, expectedSameAs] of FORGIVENESS_CASES) {
   console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${JSON.stringify(messy).padEnd(22)} -> ${normalize(messy)}`);
 }
 
-// The critical invariant: both spellings of question 2 must canonicalize
-// identically, or a gift sealed under one is unopenable by the other.
-console.log('\nKey-derivation invariant');
-const [q2a, q2b] = QUESTIONS[1].accepted;
-const sameCanonical = canonicalize(q2a) === canonicalize(q2b);
-if (!sameCanonical) failures += 1;
-console.log(`  ${sameCanonical ? 'ok  ' : 'FAIL'}  canonicalize(${q2a}) === canonicalize(${q2b}) -> ${canonicalize(q2a)}`);
+// THE critical invariant: within each question, every accepted spelling must
+// canonicalize identically, or a gift sealed under one spelling is
+// permanently unopenable by someone who typed another.
+console.log('\nKey-derivation invariant — per question');
+for (const [i, { q, accepted }] of QUESTIONS.entries()) {
+  const forms = accepted.map((a) => canonicalize(a));
+  const unique = [...new Set(forms)];
+  const ok = unique.length === 1;
+  if (!ok) failures += 1;
+  console.log(
+    `  ${ok ? 'ok  ' : 'FAIL'}  Q${i + 1} ${accepted.length} spelling(s) -> ${unique.join(' | ')}  ${q}`,
+  );
+}
 
-const material = keyMaterial(['יפיופה', 'של ערן']);
-const materialAlt = keyMaterial(['יפיופה', 'ערן']);
-const sameMaterial = material === materialAlt;
-if (!sameMaterial) failures += 1;
-console.log(`  ${sameMaterial ? 'ok  ' : 'FAIL'}  both spellings yield identical key material -> ${material}`);
+// And across every combination of spellings the user could actually type.
+console.log('\nKey-derivation invariant — every combination');
+const combos = QUESTIONS.reduce(
+  (acc, { accepted }) => acc.flatMap((prefix) => accepted.map((a) => [...prefix, a])),
+  [[]],
+);
+const materials = new Set(combos.map((c) => keyMaterial(c)));
+const singleMaterial = materials.size === 1;
+if (!singleMaterial) failures += 1;
+console.log(
+  `  ${singleMaterial ? 'ok  ' : 'FAIL'}  ${combos.length} combination(s) -> ${[...materials].join(' | ')}`,
+);
 
 // The browser hashes with crypto.subtle, not node:crypto. If those two ever
 // disagreed, the gate would reject every correct answer. webcrypto here is the
