@@ -1,0 +1,27 @@
+# Original photos — personal, large, and rebuilt into public/images by the
+# image pipeline. Never tracked.
+/images/
+
+# PLAINTEXT gift content. Committing this defeats CAP-5 silently and puts the
+# entire surprise one `git log` away. See the spec's threat-model.md.
+/gifts-src/
+
+# Build output
+/dist/
+/public/images/
+/public/gifts/
+
+# Dependencies
+node_modules/
+
+# Env / local
+.env
+.env.local
+*.local
+
+# OS / editor noise
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.swp

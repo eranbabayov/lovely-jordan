@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Deliberately NO catch-all SPA rewrite. There is no client-side router, and a
+# `/* -> /index.html 200` rule would make a missing sealed gift or image
+# manifest return HTML with status 200 instead of a 404 — turning a clear
+# "file not found" into a confusing JSON parse error at unseal time (story 6).

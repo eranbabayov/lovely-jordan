@@ -1,0 +1,30 @@
+{
+  "name": "lovely-jordan",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A private gift for Yarden — looping photo slideshow and time-locked gifts.",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^6.4.4"
+  },
+  "//engines-note": "Vite 6 is the newest major supporting Node 20.12.2 (7 and 8 both require ^20.19 || >=22.12). Upgrade Node to 22 LTS to move to Vite 8.",
+  "engines": {
+    "node": ">=20.12.0"
+  }
+}

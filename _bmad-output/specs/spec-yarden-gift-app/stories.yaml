@@ -1,0 +1,103 @@
+- id: "1"
+  title: Scaffold the RTL app shell and prove static hosting
+  description: >-
+    Stand up Vite + React + TypeScript + Tailwind per stack.md, with
+    index.html as lang=he dir=rtl, the Hebrew display font, and robots.txt
+    noindex. Deploy the empty shell to a private-repo static host and confirm
+    it serves over HTTPS.
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Nothing else may be built until HTTPS is confirmed: crypto.subtle only
+    exists in a secure context, so CAP-1 and CAP-5 both die silently on plain
+    http. Use 100dvh not 100vh and wire safe-area insets into the base layout
+    now rather than retrofitting them. Build must emit a plain static dist/.
+
+- id: "2"
+  title: Build the image pipeline and photo manifest
+  description: >-
+    Implement scripts/build-images.mjs per image-pipeline.md over the 25
+    JPEGs already in images/: bake EXIF orientation, emit 900px and 1600px
+    WebP plus an LQIP data URI, and write a chronologically ordered
+    public/images/manifest.json.
+  invoke_dev_with: >-
+    The supplied set is all .jpeg with no HEIC, so keep the HEIC branch for
+    future drops but do not let it block. Sort by EXIF DateTimeOriginal and
+    fall back to file mtime then filename when it is absent — several of
+    these files are renamed GUIDs and may carry no EXIF date at all. Never
+    silently drop a photo; log any that lack a date.
+
+- id: "3"
+  title: Endless auto-advancing photo slideshow
+  description: >-
+    Implement CAP-2 against the manifest: two cross-fading layers, slow
+    Ken-Burns, a single exported SLIDE_MS constant defaulting to 4000, and a
+    seamless wrap from last photo to first.
+  invoke_dev_with: >-
+    SLIDE_MS must be one constant Eran can change in a second — he originally
+    asked for 1000ms and may switch back. Never allow below 1000ms. Preload
+    the next 3 entries and await img.decode() before swapping or the advance
+    visibly hitches. Pause on visibilitychange. Drop Ken-Burns under
+    prefers-reduced-motion. Controls: tap to pause, swipe to step,
+    long-press to hold, and no persistent chrome.
+
+- id: "4"
+  title: The entry gate with forgiving Hebrew answer matching
+  description: >-
+    Implement CAP-1 per hebrew-matching.md: the two questions, the
+    normalization function, SHA-256 digest comparison, escalating hints, and
+    an unlocked flag persisted in localStorage.
+  spec_checkpoint: true
+  invoke_dev_with: >-
+    Read hebrew-matching.md before writing a line. The worst outcome this app
+    can produce is locking Yarden out of her own gift: no attempt limit, no
+    cooldown, no lockout, ever. Question 2 has two accepted answers and so
+    carries two digests. The same normalize() must be used at hash time and
+    at compare time or they drift apart. Copy is second-person feminine and
+    affectionate — never a system error voice. Input font-size >= 16px so
+    iOS does not zoom on focus.
+
+- id: "5"
+  title: Gift shelf with live countdowns on a corrected clock
+  description: >-
+    Implement CAP-3: render each configured gift as a gift-box, derive its
+    pending/imminent/ready state from the corrected clock, and show a
+    correctly pluralised Hebrew countdown per flow-diagrams.md.
+  invoke_dev_with: >-
+    Read the clock offset once per session from the host's own HEAD Date
+    header per stack.md, cache the delta, and apply it on every tick; fall
+    back to Date.now() if the header is missing — a soft lock is acceptable,
+    a broken countdown is not. Hebrew has a dual form: 2 days is yomayim,
+    never 2 yamim. Reveal times are ISO with explicit offset pinned to
+    Asia/Jerusalem. Tremble the box at T-60s and chime at zero unless muted.
+
+- id: "6"
+  title: Seal, unseal, and the gift-opening sequence
+  description: >-
+    Implement CAP-5 and CAP-4: scripts/seal-gifts.mjs encrypting gifts-src
+    into public/gifts/*.sealed.json, browser-side unsealing from the gate
+    answers, the box-opening animation, and a renderer per gift kind.
+  spec_checkpoint: true
+  invoke_dev_with: >-
+    The PBKDF2 and AES-GCM derivation in Node and in the browser must match
+    exactly or gifts become permanently unopenable — add a round-trip test
+    that seals and unseals a fixture before wiring any UI. Question 2's two
+    accepted answers mean unsealing tries each normalization until the GCM
+    tag validates. gifts-src/ must be gitignored before the first real gift
+    is placed in it; a committed plaintext gift defeats CAP-5 silently. The
+    derived key is session-memory only: never persisted, never logged. Failed
+    unseal is retryable and never destructive. Opened gifts reopen forever.
+
+- id: "7"
+  title: Installable app shell, ambient music, and final polish
+  description: >-
+    Implement CAP-7 and CAP-8: webmanifest and icons so the gift installs to
+    her home screen, optional music started by the opening tap with a
+    persistent mute control, plus confetti and the visual pass from stack.md.
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Mobile autoplay policy means audio can only start from the opening tap
+    gesture — that is why the opening screen exists. Ship silent and with no
+    broken control if no track has been supplied. Mute choice persists across
+    visits and suppresses the countdown chime too. Verify install works on
+    both iOS Safari and Android Chrome, then test the whole flow end to end
+    on Yarden's actual phone model with a reveal time set one minute out.

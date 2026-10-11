@@ -1,0 +1,71 @@
+@import 'tailwindcss';
+
+/* Palette and type per the spec's stack.md § Visual direction:
+   deep plum/night ground, soft gold accents, one rounded Hebrew face. */
+@theme {
+  --color-night: #150b19;
+  --color-plum: #2d1b33;
+  --color-plum-soft: #3d2545;
+  --color-gold: #d4af6a;
+  --color-gold-soft: #e8c88a;
+  --color-cream: #f5ede4;
+
+  --font-display: 'Heebo', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    background-color: var(--color-night);
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-display);
+    color: var(--color-cream);
+    -webkit-font-smoothing: antialiased;
+    /* The page body must never scroll sideways. */
+    overflow-x: hidden;
+    /* No pull-to-refresh bounce fighting the slideshow later. */
+    overscroll-behavior-y: none;
+  }
+
+  /* 100dvh, never 100vh: on iOS Safari 100vh exceeds the visible area and
+     the layout is clipped behind the address bar. Safe-area insets are wired
+     in here rather than retrofitted per-component. */
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-inline-start: env(safe-area-inset-left);
+    padding-inline-end: env(safe-area-inset-right);
+  }
+
+  /* Inputs must be >= 16px or iOS zooms the page on focus. Matters for the
+     gate in story 4; set once, here. */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: max(1rem, 16px);
+  }
+
+  /* The spec degrades Ken-Burns and confetti to PLAIN FADES under reduced
+     motion rather than killing all motion (stack.md § Visual direction), so
+     keyframe animations are suppressed but opacity transitions must survive —
+     the slideshow crossfade in story 3 depends on them. Do not add a blanket
+     `transition-duration: 0.01ms` here. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

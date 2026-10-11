@@ -1,0 +1,3 @@
+# Private gift. Not for indexing.
+User-agent: *
+Disallow: /

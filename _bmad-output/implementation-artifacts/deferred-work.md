@@ -1,0 +1,15 @@
+- source_spec: `_bmad-output/specs/spec-yarden-gift-app/stories/1-scaffold-rtl-shell-and-static-hosting.md`
+  summary: Heebo is loaded from Google Fonts, adding a third-party request and a failure point to an app that should be self-contained.
+  evidence: `index.html` links `fonts.googleapis.com`. `display=swap` means text still renders in a fallback face if the CDN is slow or blocked, so this is degradation rather than breakage — but self-hosting the two Heebo weights removes the dependency and the privacy leak. Natural fit for story 7 polish.
+
+- source_spec: `_bmad-output/specs/spec-yarden-gift-app/stories/1-scaffold-rtl-shell-and-static-hosting.md`
+  summary: No favicon, so browsers request /favicon.ico and log a 404.
+  evidence: Cosmetic only, and story 7 (CAP-7) already owns icons and the webmanifest. Folding it in there avoids doing icon work twice.
+
+- source_spec: `_bmad-output/specs/spec-yarden-gift-app/stories/1-scaffold-rtl-shell-and-static-hosting.md`
+  summary: Toolchain is pinned to Vite 6 because the local Node is 20.12.2; Vite 7 and 8 both require ^20.19 || >=22.12.
+  evidence: Verified against npm — only Vite 6 declares `^20.0.0`. The first install picked Vite 8 and failed at build with a missing `@rolldown/binding-win32-x64-msvc` native binding. Pinning is project-local and reversible; upgrading Node to 22 LTS would unblock Vite 8 but changes Eran's global environment, so it is his call, not a side effect of this story.
+
+- source_spec: `_bmad-output/specs/spec-yarden-gift-app/stories/1-scaffold-rtl-shell-and-static-hosting.md`
+  summary: No `.nvmrc` or CI pin, so a later Node change could silently land outside Vite 6's supported range.
+  evidence: `engines` is set to `>=20.12.0`, which is looser than Vite 6's actual `^18 || ^20 || >=22` — Node 21 would satisfy the former and not the latter. Low impact while this is a single-developer local build; worth tightening if CI is ever added.
