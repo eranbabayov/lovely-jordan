@@ -12,6 +12,9 @@
  */
 
 import { webcrypto } from 'node:crypto';
+import { readdir, readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { keyMaterial, canonicalize } from '../src/lib/normalize.js';
 import { IV_BYTES, KEY_BITS, PBKDF2_ITERATIONS, PBKDF2_SALT } from '../src/lib/seal-params.js';
 import { deriveKey, seal } from './seal-gifts.mjs';
@@ -132,6 +135,45 @@ console.log('\nIV uniqueness');
   const b = await seal(encryptKey, encoder.encode('same'));
   check(a.iv !== b.iv, 'two seals of identical content use different IVs');
   check(a.ciphertext !== b.ciphertext, 'and produce different ciphertext');
+}
+
+// ---- The real sealed gifts, not just a fixture ----
+// A fixture proves the algorithm; this proves the actual files on disk open.
+console.log('\nReal sealed gifts open and match their source');
+{
+  const root = path.resolve(import.meta.dirname, '..');
+  const srcDir = path.join(root, 'gifts-src');
+  const sealedDir = path.join(root, 'public', 'gifts');
+
+  if (!existsSync(sealedDir)) {
+    check(false, 'public/gifts/ exists', 'run `npm run seal`');
+  } else {
+    const sealedFiles = (await readdir(sealedDir)).filter((f) => f.endsWith('.sealed.json'));
+    check(sealedFiles.length > 0, 'at least one sealed gift present');
+
+    const sources = existsSync(srcDir) ? await readdir(srcDir) : [];
+
+    for (const file of sealedFiles) {
+      const payload = JSON.parse(await readFile(path.join(sealedDir, file), 'utf8'));
+      let ok = false;
+      let detail = '';
+      try {
+        const bytes = await unseal(decryptKey, payload.iv, payload.ciphertext);
+        const source = sources.find((s) => s.replace(/\.[^.]+$/, '') === payload.id);
+        if (!source) {
+          detail = 'no matching file in gifts-src/';
+        } else {
+          const original = await readFile(path.join(srcDir, source));
+          ok = Buffer.compare(Buffer.from(bytes), original) === 0;
+          const preview = decoder.decode(bytes).split('\n')[0]?.slice(0, 28) ?? '';
+          detail = `${original.length} B  "${preview}…"`;
+        }
+      } catch (err) {
+        detail = `threw: ${err.message}`;
+      }
+      check(ok, payload.id.padEnd(8), detail);
+    }
+  }
 }
 
 console.log('\nCanonical forms in use');

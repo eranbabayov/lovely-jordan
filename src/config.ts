@@ -96,7 +96,7 @@ export const ANSWERS: AnswerConfig[] = [
 export const GIFTS: GiftConfig[] = [
   {
     id: 'gift1',
-    title: 'מתנה ראשונה',
+    title: 'מכתב בשבילך',
     emoji: '💌',
     kind: 'letter',
     revealAt: null, // open immediately, so the app gives something at once
