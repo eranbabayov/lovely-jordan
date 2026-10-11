@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Opening from './components/Opening';
 import Gate from './components/Gate';
-import Slideshow from './components/Slideshow';
+import PhotoRow from './components/PhotoRow';
 import GiftShelf from './components/GiftShelf';
 import GiftOpening from './components/GiftOpening';
 import MuteButton from './components/MuteButton';
@@ -113,17 +113,18 @@ export default function App() {
   }
 
   return (
-    <main className="relative flex-1">
-      <Slideshow photos={photos} />
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 flex justify-start p-3"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
-      >
-        <MuteButton />
+    <main className="relative flex flex-1 flex-col">
+      {/* Photos read as a band across the top; the gifts own the centre. */}
+      <div className="shrink-0 pt-3">
+        <PhotoRow photos={photos} />
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0">
+      <div className="flex flex-1 items-center justify-center py-6">
         <GiftShelf openedIds={openedIds} onOpen={setActiveGift} />
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-start p-3">
+        <MuteButton />
       </div>
 
       {activeGift ? (

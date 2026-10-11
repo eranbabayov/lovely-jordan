@@ -59,4 +59,38 @@ export function formatCountdown(remainingMs) {
   return seconds === 1 ? 'עוד שנייה' : `עוד ${seconds} שניות`;
 }
 
+/**
+ * Split remaining time into whole days / hours / minutes / seconds.
+ *
+ * Used for the digital `DD:HH:MM:SS` display. The prose `formatCountdown`
+ * above is still used for the accessible label, where "יומיים" reads far
+ * better than "02:00:00:00".
+ *
+ * @param {number} remainingMs
+ * @returns {{days: number, hours: number, minutes: number, seconds: number}}
+ */
+export function splitDuration(remainingMs) {
+  const t = Math.max(0, remainingMs);
+  return {
+    days: Math.floor(t / DAY),
+    hours: Math.floor((t % DAY) / HOUR),
+    minutes: Math.floor((t % HOUR) / MINUTE),
+    seconds: Math.floor((t % MINUTE) / SECOND),
+  };
+}
+
+/**
+ * `DD:HH:MM:SS`, zero-padded. Days are not capped at two digits — a reveal
+ * more than 99 days out renders as `100:…` rather than silently wrapping.
+ *
+ * @param {number} remainingMs
+ * @returns {string}
+ */
+export function formatClock(remainingMs) {
+  const { days, hours, minutes, seconds } = splitDuration(remainingMs);
+  return [days, hours, minutes, seconds]
+    .map((n) => String(n).padStart(2, '0'))
+    .join(':');
+}
+
 export const units = { DAYS, HOURS, MINUTES, plural, clock };

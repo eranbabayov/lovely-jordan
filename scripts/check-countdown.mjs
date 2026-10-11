@@ -7,7 +7,7 @@
  * gift by an hour, and Israel changes offset on 2026-10-25.
  */
 
-import { formatCountdown } from '../src/lib/hebrew.js';
+import { formatCountdown, formatClock, splitDuration } from '../src/lib/hebrew.js';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -39,6 +39,31 @@ expect(formatCountdown(1 * MINUTE), '01:00', 'exactly 1 minute');
 expect(formatCountdown(1 * MINUTE - 1), 'עוד 60 שניות', 'just under a minute');
 expect(formatCountdown(5 * SECOND), 'עוד 5 שניות', '5 seconds');
 expect(formatCountdown(1 * SECOND), 'עוד שנייה', '1 second');
+
+console.log('\nDigital clock — DD:HH:MM:SS');
+expect(formatClock(0), '00:00:00:00', 'zero');
+expect(formatClock(-5000), '00:00:00:00', 'negative clamps to zero');
+expect(formatClock(1 * SECOND), '00:00:00:01', '1 second');
+expect(formatClock(59 * SECOND), '00:00:00:59', '59 seconds');
+expect(formatClock(1 * MINUTE), '00:00:01:00', 'rolls into minutes');
+expect(formatClock(1 * HOUR), '00:01:00:00', 'rolls into hours');
+expect(formatClock(1 * DAY), '01:00:00:00', 'rolls into days');
+expect(
+  formatClock(2 * DAY + 14 * HOUR + 33 * MINUTE + 8 * SECOND),
+  '02:14:33:08',
+  'mixed duration',
+);
+expect(formatClock(1 * DAY - 1 * SECOND), '00:23:59:59', 'one second under a day');
+expect(formatClock(100 * DAY), '100:00:00:00', 'days are not capped at two digits');
+
+{
+  const d = splitDuration(3 * DAY + 4 * HOUR + 5 * MINUTE + 6 * SECOND);
+  expect(
+    `${d.days}/${d.hours}/${d.minutes}/${d.seconds}`,
+    '3/4/5/6',
+    'splitDuration components',
+  );
+}
 
 console.log('\nConfigured reveal dates — Israel wall clock');
 // Israel is UTC+3 under DST, UTC+2 otherwise; DST ends Sunday 2026-10-25.

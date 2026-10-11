@@ -57,11 +57,11 @@ export default function GiftShelf({ openedIds, onOpen }: GiftShelfProps) {
   if (GIFTS.length === 0) return null;
 
   return (
-    <section
-      className="pointer-events-auto w-full bg-gradient-to-t from-night via-night/95 to-transparent pb-6 pt-12"
-      aria-label="המתנות שלך"
-    >
-      <div className="flex justify-center gap-2 overflow-x-auto px-4">
+    <section className="w-full px-4" aria-label="המתנות שלך">
+      {/* One column on a phone so each box is genuinely large; side by side
+          once there is room. Never a fixed 3-wide grid — the gift count is
+          config-driven and must not be baked into the layout. */}
+      <div className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {GIFTS.map((gift) => (
           <GiftBox
             key={gift.id}

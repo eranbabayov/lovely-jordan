@@ -59,20 +59,22 @@
      keyframe animations are suppressed but opacity transitions must survive —
      the slideshow crossfade in story 3 depends on them. Do not add a blanket
      `transition-duration: 0.01ms` here. */
-  /* Slow drift across each photo. Deliberately a keyframe ANIMATION, so the
-     reduced-motion rule below suppresses it while the crossfade (an opacity
-     transition) survives — "degrade to plain fades", per stack.md. */
-  @keyframes ken-burns {
+  /* Continuously sliding photo strip. The list is rendered twice and this
+     translates exactly -50%, so the second copy lands where the first began
+     and the seam is invisible. */
+  @keyframes marquee {
     from {
-      transform: scale(1.02) translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
     }
     to {
-      transform: scale(1.12) translate3d(0, -1.5%, 0);
+      transform: translate3d(-50%, 0, 0);
     }
   }
 
-  .ken-burns {
-    animation: ken-burns var(--kb-duration, 4800ms) ease-out forwards;
+  .animate-marquee {
+    animation-name: marquee;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
     will-change: transform;
   }
 
@@ -174,6 +176,17 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       scroll-behavior: auto !important;
+    }
+
+    /* The strip must stay reachable rather than frozen mid-slide: stop the
+       animation outright and let her scroll it by hand instead. */
+    .animate-marquee {
+      animation: none !important;
+      transform: none !important;
+    }
+
+    .photo-strip {
+      overflow-x: auto !important;
     }
   }
 }
