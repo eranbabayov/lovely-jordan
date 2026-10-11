@@ -11,7 +11,8 @@
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "digests": "node scripts/answer-digests.mjs",
-    "check": "node scripts/answer-digests.mjs && node scripts/check-countdown.mjs"
+    "check": "node scripts/answer-digests.mjs && node scripts/check-countdown.mjs && node scripts/check-seal.mjs",
+    "seal": "node scripts/seal-gifts.mjs"
   },
   "dependencies": {
     "react": "^19.3.0",

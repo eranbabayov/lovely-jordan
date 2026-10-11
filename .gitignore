@@ -6,6 +6,11 @@
 # entire surprise one `git log` away. See the spec's threat-model.md.
 /gifts-src/
 
+# PLAINTEXT gate answers. Holding these lets anyone derive the gift key and
+# open everything, so they are the same category of secret as gifts-src/.
+# Only the SHA-256 digests belong in version control (src/config.ts).
+/secrets/
+
 # Build output
 /dist/
 /public/images/

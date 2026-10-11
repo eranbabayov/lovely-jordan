@@ -5,32 +5,24 @@
  *
  *   node scripts/answer-digests.mjs
  *
- * The plaintext answers live HERE and nowhere in the shipped bundle.
+ * The plaintext answers are NOT in this file — they live in the gitignored
+ * `secrets/answers.mjs`, because anyone holding them can derive the gift key
+ * and open everything. Only digests belong in version control.
  */
 
 import { createHash } from 'node:crypto';
 import { normalize, canonicalize, keyMaterial } from '../src/lib/normalize.js';
+import { ACCEPTED_ANSWERS, FORGIVENESS_CASES } from '../secrets/answers.mjs';
 
 const sha256 = (s) => createHash('sha256').update(s, 'utf8').digest('hex');
 
-/** Question 1 accepts one spelling; question 2 accepts two. */
-const QUESTIONS = [
-  { q: 'איך אני קורא לך?', accepted: ['יפיופה'] },
-  { q: 'של מי את?', accepted: ['של ערן', 'ערן'] },
-];
+/** Question text is not secret; the answers come from secrets/. */
+const QUESTION_TEXT = ['איך אני קורא לך?', 'של מי את?'];
 
-/** Forgiveness cases that must all reduce to an accepted form. */
-const FORGIVENESS = [
-  ['יפיופה ', 'יפיופה'],
-  [' יפיופה', 'יפיופה'],
-  ['יְפֵיופֵה', 'יפיופה'],
-  ['יפיופה!', 'יפיופה'],
-  ['של ערן', 'של ערן'],
-  ['שֶׁל עֵרָן', 'של ערן'],
-  ['  ערן  ', 'ערן'],
-  ['ערן?', 'ערן'],
-  ['שלערן', 'של ערן'],
-];
+const QUESTIONS = QUESTION_TEXT.map((q, i) => ({
+  q,
+  accepted: ACCEPTED_ANSWERS[i] ?? [],
+}));
 
 let failures = 0;
 
@@ -43,7 +35,7 @@ for (const { q, accepted } of QUESTIONS) {
 }
 
 console.log('\nForgiveness (messy input must match an accepted spelling)');
-for (const [messy, expectedSameAs] of FORGIVENESS) {
+for (const [messy, expectedSameAs] of FORGIVENESS_CASES) {
   const ok = normalize(messy) === normalize(expectedSameAs);
   if (!ok) failures += 1;
   console.log(`  ${ok ? 'ok  ' : 'FAIL'}  ${JSON.stringify(messy).padEnd(22)} -> ${normalize(messy)}`);

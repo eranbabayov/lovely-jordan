@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Opening from './components/Opening';
 import Gate from './components/Gate';
 import Slideshow from './components/Slideshow';
 import GiftShelf from './components/GiftShelf';
+import GiftOpening from './components/GiftOpening';
 import type { Photo } from './lib/photos';
 import { loadManifest } from './lib/photos';
+import type { GiftConfig } from './config';
 import { STORAGE_KEYS } from './config';
 
 function readStoredMaterial(): string | null {
@@ -13,6 +15,16 @@ function readStoredMaterial(): string | null {
   } catch {
     // Private browsing can throw on access; treat as not-yet-unlocked.
     return null;
+  }
+}
+
+function readOpenedIds(): string[] {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.opened);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
+  } catch {
+    return [];
   }
 }
 
@@ -36,7 +48,21 @@ export default function App() {
   const [material, setMaterial] = useState<string | null>(readStoredMaterial);
   const [photos, setPhotos] = useState<Photo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [openedIds, setOpenedIds] = useState<string[]>([]);
+  const [openedIds, setOpenedIds] = useState<string[]>(readOpenedIds);
+  const [activeGift, setActiveGift] = useState<GiftConfig | null>(null);
+
+  const markOpened = useCallback((id: string) => {
+    setOpenedIds((ids) => {
+      if (ids.includes(id)) return ids;
+      const next = [...ids, id];
+      try {
+        window.localStorage.setItem(STORAGE_KEYS.opened, JSON.stringify(next));
+      } catch {
+        // Label-only convenience; the gift stays openable regardless.
+      }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     loadManifest()
@@ -77,13 +103,17 @@ export default function App() {
     <main className="relative flex-1">
       <Slideshow photos={photos} />
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
-        <GiftShelf
-          openedIds={openedIds}
-          onOpen={(gift) =>
-            setOpenedIds((ids) => (ids.includes(gift.id) ? ids : [...ids, gift.id]))
-          }
-        />
+        <GiftShelf openedIds={openedIds} onOpen={setActiveGift} />
       </div>
+
+      {activeGift ? (
+        <GiftOpening
+          gift={activeGift}
+          material={material}
+          onClose={() => setActiveGift(null)}
+          onOpened={markOpened}
+        />
+      ) : null}
     </main>
   );
 }

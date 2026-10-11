@@ -127,4 +127,5 @@ export const MUSIC_SRC: string | null = null;
 export const STORAGE_KEYS = {
   unlocked: 'yg.unlocked',
   muted: 'yg.muted',
+  opened: 'yg.opened',
 } as const;

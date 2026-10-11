@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { Photo } from '../lib/photos';
 import { pickSrc, preload } from '../lib/photos';
 import { CROSSFADE_MS, SLIDE_MS } from '../config';
@@ -98,12 +99,14 @@ export default function Slideshow({ photos }: SlideshowProps) {
     }
   };
 
-  const onPointerDown = (e: React.PointerEvent) => {
+  // Typed structurally rather than with React's event aliases, which
+  // @types/react 19 deprecates. These handlers only need the x coordinate.
+  const onPointerDown = (e: { clientX: number }) => {
     pointerStart.current = { x: e.clientX, t: Date.now() };
     longPressTimer.current = window.setTimeout(() => setHolding(true), LONG_PRESS_MS);
   };
 
-  const onPointerUp = (e: React.PointerEvent) => {
+  const onPointerUp = (e: { clientX: number }) => {
     clearLongPress();
     const start = pointerStart.current;
     pointerStart.current = null;
@@ -159,7 +162,7 @@ export default function Slideshow({ photos }: SlideshowProps) {
             <div
               key={photo.origin}
               className="ken-burns h-full w-full"
-              style={{ '--kb-duration': `${SLIDE_MS + CROSSFADE_MS}ms` } as React.CSSProperties}
+              style={{ '--kb-duration': `${SLIDE_MS + CROSSFADE_MS}ms` } as CSSProperties}
             >
               <img
                 src={pickSrc(photo)}

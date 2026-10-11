@@ -53,8 +53,9 @@ export default function Gate({ onUnlock }: GateProps) {
 
   if (!question) return null;
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // No event parameter: @types/react 19 deprecates the FormEvent aliases, and
+  // the caller handles preventDefault inline so no React event type is named.
+  const submit = async () => {
     if (checking || value.trim() === '') return;
     setChecking(true);
     try {
@@ -94,7 +95,10 @@ export default function Gate({ onUnlock }: GateProps) {
       </div>
 
       <form
-        onSubmit={submit}
+        onSubmit={(e) => {
+          e.preventDefault();
+          void submit();
+        }}
         key={attempts}
         className={`flex w-full max-w-sm flex-col items-center gap-6 ${attempts > 0 ? 'animate-shake' : ''}`}
       >
