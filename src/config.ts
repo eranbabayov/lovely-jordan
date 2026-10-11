@@ -167,11 +167,21 @@ export const NOTES: string[] = [
 export const NOTE_ROTATE_MS = 4000;
 
 /**
- * No track supplied, so the app ships silent (SPEC.md § Assumptions).
- * Set a path under `public/` to enable audio; the mute control and the
- * countdown chime stay behind this flag so nothing broken is shown.
+ * Background track, served from `public/`. Set to `null` to ship silent.
+ *
+ * Starts on the Opening tap — mobile browsers refuse to begin audio outside a
+ * user gesture, which is the whole reason that screen exists.
  */
-export const MUSIC_SRC: string | null = null;
+export const MUSIC_SRC: string | null = 'audio/birthday-song.mp3';
+
+/**
+ * Whether the track repeats. A sung birthday song on endless repeat gets old
+ * fast, so this is off: it plays once and stops.
+ */
+export const MUSIC_LOOP = false;
+
+/** Playback volume, 0–1. Low enough to sit under the moment, not over it. */
+export const MUSIC_VOLUME = 0.5;
 
 /** localStorage keys. */
 export const STORAGE_KEYS = {

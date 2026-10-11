@@ -11,7 +11,7 @@
  * with `MUSIC_SRC === null`, rather than being a dead switch.
  */
 
-import { MUSIC_SRC, STORAGE_KEYS } from '../config';
+import { MUSIC_LOOP, MUSIC_SRC, MUSIC_VOLUME, STORAGE_KEYS } from '../config';
 
 let context: AudioContext | null = null;
 let music: HTMLAudioElement | null = null;
@@ -40,7 +40,11 @@ export function isMuted(): boolean {
 export function setMuted(value: boolean): void {
   muted = value;
   persistMuted(value);
-  if (music) music.muted = value;
+  if (!music) return;
+  music.muted = value;
+  // Unmuting is itself a user gesture, so it doubles as a retry if autoplay
+  // was refused earlier.
+  if (!value && music.paused) void music.play().catch(() => {});
 }
 
 /**
@@ -56,12 +60,14 @@ export function unlock(): void {
     void context?.resume();
 
     if (MUSIC_SRC && !music) {
-      music = new Audio(MUSIC_SRC);
-      music.loop = true;
-      music.volume = 0.35;
+      // Resolve against the deploy base so a subdirectory deploy still finds it.
+      music = new Audio(`${import.meta.env.BASE_URL}${MUSIC_SRC.replace(/^\//, '')}`);
+      music.loop = MUSIC_LOOP;
+      music.volume = MUSIC_VOLUME;
       music.muted = muted;
+      music.preload = 'auto';
       void music.play().catch(() => {
-        // Autoplay still refused: the mute toggle can retry later.
+        // Autoplay still refused: unmuting is a gesture and will retry.
       });
     }
   } catch {
