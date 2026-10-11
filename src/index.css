@@ -76,6 +76,39 @@
     will-change: transform;
   }
 
+  /* Idle float on an openable gift, and the T-60s tremble. Both decorative
+     keyframe animations, so reduced motion drops them. */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3.5s ease-in-out infinite;
+  }
+
+  @keyframes tremble {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+      transform: translate(-1.5px, 1px) rotate(-1.5deg);
+    }
+    75% {
+      transform: translate(1.5px, -1px) rotate(1.5deg);
+    }
+  }
+
+  .animate-tremble {
+    animation: tremble 180ms ease-in-out infinite;
+  }
+
   /* Wrong answer. Decorative, so losing it under reduced motion is fine. */
   @keyframes shake {
     0%,

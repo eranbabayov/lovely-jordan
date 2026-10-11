@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Opening from './components/Opening';
 import Gate from './components/Gate';
 import Slideshow from './components/Slideshow';
+import GiftShelf from './components/GiftShelf';
 import type { Photo } from './lib/photos';
 import { loadManifest } from './lib/photos';
 import { STORAGE_KEYS } from './config';
@@ -35,6 +36,7 @@ export default function App() {
   const [material, setMaterial] = useState<string | null>(readStoredMaterial);
   const [photos, setPhotos] = useState<Photo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [openedIds, setOpenedIds] = useState<string[]>([]);
 
   useEffect(() => {
     loadManifest()
@@ -74,6 +76,14 @@ export default function App() {
   return (
     <main className="relative flex-1">
       <Slideshow photos={photos} />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0">
+        <GiftShelf
+          openedIds={openedIds}
+          onOpen={(gift) =>
+            setOpenedIds((ids) => (ids.includes(gift.id) ? ids : [...ids, gift.id]))
+          }
+        />
+      </div>
     </main>
   );
 }
